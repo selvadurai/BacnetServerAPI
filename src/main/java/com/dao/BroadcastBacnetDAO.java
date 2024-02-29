@@ -53,6 +53,21 @@ public class BroadcastBacnetDAO {
             // Handle exceptions according to your application's needs
         }
     }
+    
+    // Delete a BroadcastBacnet record from the database based on instanceNum
+    public void deleteBroadcastBacnetName(String deviceName) {
+        try (Connection connection = DriverManager.getConnection(URL);
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "DELETE FROM BroadcastBacnet WHERE deviceName = ?"
+             )) {
+            preparedStatement.setString(1, deviceName);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle exceptions according to your application's needs
+        }
+    }
 
     // Insert a new BroadcastBacnet record into the database
     public void insertBroadcastBacnet(BroadcastBacnet broadcastBacnet) {

@@ -20,16 +20,19 @@ import com.serotonin.bacnet4j.obj.AnalogOutputObject;
 import com.serotonin.bacnet4j.obj.AnalogValueObject;
 import com.serotonin.bacnet4j.obj.BACnetObject;
 import com.serotonin.bacnet4j.obj.BinaryInputObject;
+import com.serotonin.bacnet4j.obj.BinaryOutputObject;
+import com.serotonin.bacnet4j.obj.BinaryValueObject;
 import com.serotonin.bacnet4j.type.enumerated.BinaryPV;
 import com.serotonin.bacnet4j.type.enumerated.EngineeringUnits;
+import com.serotonin.bacnet4j.type.enumerated.Polarity;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.Real;
 
 import server.BacnetServerObject;
 
 public class BroadcastBacnetMap {
-	
-	
+		
+  	
    private ConcurrentHashMap<String,BACnetObject> broadcastMap;
    List<BACnetObject> bacNetList;
    BacnetServerObject server=BacnetServerObject.getInstance();
@@ -76,14 +79,29 @@ public class BroadcastBacnetMap {
 
 	   
 	   for(int i=0;i<baclist.size();i++) {
-		   String name=baclist.get(i).getName();;
+		   String name=baclist.get(i).getName();
+		   String objectType=baclist.get(i).getBacObjType();
 		   String bacnetObjectName=deviceName+baclist.get(i).getName();
-		   float value= jsonObject.get(name).getAsFloat();
-		   broadcastMap.get(bacnetObjectName).writePropertyInternal(PropertyIdentifier.presentValue, new Real(value));
+		 
 		   
-	   }
+		   switch(objectType.charAt(0)) {
+		     
+		     case 'A':
+		  	          float floatValue= jsonObject.get(name).getAsFloat();
+			          broadcastMap.get(bacnetObjectName).writePropertyInternal(PropertyIdentifier.presentValue, new Real(floatValue));
+		    	      break;
+		     case 'B': 
+		    	      boolean boolValue= jsonObject.get(name).getAsBoolean();
+		    	      BinaryPV presentValue = getBinaryPvValue(boolValue);
+			          broadcastMap.get(bacnetObjectName).writePropertyInternal(PropertyIdentifier.presentValue,presentValue );
+		              break;
+		    }   
+		   
+		   
+		}
+	}
 	   
-   }
+  
    
    
    
@@ -156,11 +174,75 @@ public class BroadcastBacnetMap {
 				 
 			 }
 			   
+			 else if (bacnetObjType.equals("BinaryInput")) {
+				   boolean  value=jsonObject.get(name).getAsBoolean();
+				   System.out.println("BinaryInput "+value);
+				   
+				   BinaryPV presentValue = getBinaryPvValue(value);
+				   
+		
+				   
+				   
+				   broadcastMap.put(bacnetObjectName, 
+				                    new  BinaryInputObject(server.getLocalDevice(), 
+				        		   	instanceNum, 
+				        		   	bacnetObjectName, 
+				        		   	presentValue, 
+				        		   	java.lang.Boolean.TRUE,
+				        		   	Polarity.normal));
+				 
+			 }  
+			   
+			 else if (bacnetObjType.equals("BinaryOutput")) {
+				   boolean  value=jsonObject.get(name).getAsBoolean();
+				   
+				   BinaryPV presentValue = getBinaryPvValue(value);
+				   
+		
+				   
+				   
+				   broadcastMap.put(bacnetObjectName, 
+				                    new  BinaryOutputObject(server.getLocalDevice(), 
+				        		   	instanceNum, 
+				        		   	bacnetObjectName, 
+				        		   	presentValue, 
+				        		   	java.lang.Boolean.TRUE,
+				        		   	Polarity.normal, 
+				        		   	BinaryPV.active));
+				 
+			 } 
+			   
+			 else if (bacnetObjType.equals("BinaryValue")) {
+				   boolean  value=jsonObject.get(name).getAsBoolean();
+				   
+				   BinaryPV presentValue = getBinaryPvValue(value);
+				   
+		
+				   
+				   
+				   broadcastMap.put(bacnetObjectName, 
+				                    new  BinaryValueObject(server.getLocalDevice(), 
+				        		   	instanceNum, 
+				        		   	bacnetObjectName, 
+				        		   	presentValue, 
+				        		   	java.lang.Boolean.TRUE));
+				 
+			 }
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
 			   
 			   BroadcastBacnetDAO broadcastDAO = new BroadcastBacnetDAO() ;
-		       broadcastDAO.insertBroadcastBacnet(instanceNum, bacnetObjectName,bacnetObjType, deviceName, name);
-				 
-					
+		       broadcastDAO.insertBroadcastBacnet(instanceNum, bacnetObjectName,bacnetObjType, deviceName, name);			 	
 					 
 		    }
 	      
@@ -256,14 +338,49 @@ public class BroadcastBacnetMap {
 				        		   	java.lang.Boolean.TRUE));
 				 
 			 }
+			 
+			 else if (bacnetObjType.equals("BinaryOutput")) {
+				   boolean  value=jsonObject.get(name).getAsBoolean();
+				   
+				   BinaryPV presentValue = getBinaryPvValue(value);
+				   
+		
+				   
+				   
+				   broadcastMap.put(bacnetObjectName, 
+				                    new  BinaryOutputObject(server.getLocalDevice(), 
+				        		   	instanceNum, 
+				        		   	bacnetObjectName, 
+				        		   	presentValue, 
+				        		   	java.lang.Boolean.TRUE,
+				        		   	Polarity.normal, 
+				        		   	BinaryPV.active));
+				 
+			 } 
+			   
+			 else if (bacnetObjType.equals("BinaryValue")) {
+				   boolean  value=jsonObject.get(name).getAsBoolean();
+				   
+				   BinaryPV presentValue = getBinaryPvValue(value);
+				   
+		
+				   
+				   
+				   broadcastMap.put(bacnetObjectName, 
+				                    new  BinaryValueObject(server.getLocalDevice(), 
+				        		   	instanceNum, 
+				        		   	bacnetObjectName, 
+				        		   	presentValue, 
+				        		   	java.lang.Boolean.TRUE));
+				 
+			 }
 			   
 			   
 			   
 				 
 					
 					 
-		    }
-	      
+		  }
 	      
 	      
 	        deviceLoadList.add(deviceName);
@@ -285,10 +402,20 @@ public class BroadcastBacnetMap {
 		   	   
    }
    
+   public BinaryPV getBinaryPvValue(boolean value) { 
+   
+	 if(value==true)   
+       return BinaryPV.active;
+	 else
+	   return BinaryPV.inactive;	 
+ 
+   
+   }
    
    
-   
-   
+   public void removeBacnetObject(String deviceName) {
+	   deviceLoadList.remove(deviceName);
+   }
    
    
    

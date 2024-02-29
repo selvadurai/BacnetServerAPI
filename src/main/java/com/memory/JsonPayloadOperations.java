@@ -32,8 +32,9 @@ public class JsonPayloadOperations {
 		    	       
 		    	      jsonObject.addProperty(keyName,Float.parseFloat(value));
 		    	      break;
-		     case 'B': 	 
-		    
+		     case 'B':
+		    	 
+	    	          jsonObject.addProperty(keyName,Boolean.parseBoolean(value));
 		              break;
 		    }   
 		    

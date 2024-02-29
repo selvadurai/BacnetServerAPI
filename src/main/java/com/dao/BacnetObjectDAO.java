@@ -48,6 +48,22 @@ public class BacnetObjectDAO {
             e.printStackTrace();
         }
     }
+    
+    
+    public void deleteBacnetObjectTemplateId(int templateId) {
+        String sql = "DELETE FROM BacnetObject WHERE devTempId = ?";
+        try (Connection connection = connect();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, templateId);
+            statement.executeUpdate();
+            // Remove the deleted BacnetObject from the thread-safe list
+            bacnetObjectList.removeIf(obj -> obj.getDevTempId() == templateId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
 
     // Update a BacnetObject by BacnetObjId (primary key)
     public void updateBacnetObject(int bacnetObjId, String bacObjType, int instanceNum, int reqDefault, String dataType, String name) {

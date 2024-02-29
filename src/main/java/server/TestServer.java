@@ -1,5 +1,6 @@
 package server;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,6 +23,10 @@ public class TestServer {
 		 System.out.println(map.get(1));
 		 map.put(1, "C++");
 		 System.out.println(map.get(1));
+		 
+		    InetAddress localhost = InetAddress.getLocalHost();
+           System.out.println("Local IP Address: " + localhost.getHostAddress());
+
 
 
 		

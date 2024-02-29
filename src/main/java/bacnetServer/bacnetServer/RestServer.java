@@ -166,6 +166,24 @@ public class RestServer {
          ctx.result(apiController.templateDeviceJsonString());	  
 	   });
       
+      app.get("/listAllTemplateDevices", ctx->{
+;
+    	  //InitHash.initDeviceBacnetBroadcastMap();
+    	  
+          ApiController apiController = new ApiController();
+          ctx.result(apiController.templateDeviceBacNetList());
+      });
+      
+      app.post("/deleteTemplates",ctx->{
+      	String jsonPayload = ctx.body();
+   		ApiController apiController = new ApiController(); 
+   		apiController.deleteTemplates(jsonPayload); 
+  	    InitHash.initTempBac();
+        InitHash.initDeviceTempID();
+  	    InitHash.initDeviceBacnetBroadcastMap();
+  	
+   	  });
+      
       
 
       

@@ -86,6 +86,7 @@ public class InitHash {
 	
 
 	public static  void initDeviceTempID () {
+		 Cache.deviceTemplateIDMap.clear();
 		
 		 DeviceDAO deviceDAO = new DeviceDAO();  
 		 List<Device> deviceList=deviceDAO.getAllDevices();
@@ -99,13 +100,17 @@ public class InitHash {
    }
 	
 	public static  void initTempBac () {
+		
+		  Cache.templateBacMap.clear();
+		
+		
 		  DeviceTempDAO deviceTempDAO = new DeviceTempDAO();
 	      List<DeviceTemplate> deviceTempList=deviceTempDAO.getAllDeviceTemplates();
 			
 		  BacnetObjectDAO bacnetObjectDAO = new BacnetObjectDAO();
 		  List<BacnetObject> bacnetObjectList =bacnetObjectDAO.getAllBacnetObjects();
 		  
-		  ConcurrentHashMap<Integer,TemplateBacnetListObject> templateHashMap  = new ConcurrentHashMap<>();
+		//  ConcurrentHashMap<Integer,TemplateBacnetListObject> templateHashMap  = new ConcurrentHashMap<>();
 
 		  
 		  
@@ -136,6 +141,8 @@ public class InitHash {
 	
 	
 	public static void initDeviceBacnetBroadcastMap() {
+		Cache.deviceBacnetBroadcastMap.clear();
+		
 		BroadcastBacnetDAO bbDAO  = new BroadcastBacnetDAO();
 		List<BroadcastBacnet> broadcastList=bbDAO.getAllBroadcastBacnets();
 		

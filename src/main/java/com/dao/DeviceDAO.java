@@ -64,6 +64,21 @@ public class DeviceDAO {
             e.printStackTrace();
         }
     }
+    
+    
+    public void deleteDeviceByDevTempId(int tempId) {
+        String deleteQuery = "DELETE FROM Device WHERE dev_temp_id = ?";
+
+        try (Connection connection = DriverManager.getConnection(url);
+             PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery)) {
+            preparedStatement.setInt(1, tempId);
+
+            preparedStatement.executeUpdate();
+            System.out.println("Device deleted successfully!");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     // Method to get a device entry by ID
     public Device getDeviceById(int deviceId) {
