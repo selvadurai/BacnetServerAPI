@@ -116,7 +116,6 @@ public class DeviceDAO {
 
             while (resultSet.next()) {
                 Device device = new Device();
-            	System.out.println(resultSet.getInt("dev_id"));
 
                 device.setDevId(resultSet.getInt("dev_id"));
                 device.setDevTempId(resultSet.getInt("dev_temp_id"));

@@ -8,14 +8,20 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.slf4j.LoggerFactory;
+
+import com.authentication.ApiTokenOperations;
+import com.authentication.UserOperations;
 import com.controller.ApiController;
 import com.dao.DeviceDAO;
 import com.dao.DeviceTempDAO;
+import com.diagonistics.Diagonstics;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import com.libraries.DateTimeAPI;
 import com.memory.BacnetBroadcastMapOperations;
 import com.memory.BroadcastBacnetMap;
 import com.memory.Cache;
@@ -39,6 +45,7 @@ import com.serotonin.bacnet4j.type.primitive.Real;
 
 import io.javalin.Javalin;
 import server.BacnetServerObject;
+import server.InitBacnetServerConfig;
 
 
 public class RestServer {
@@ -56,17 +63,21 @@ public class RestServer {
 
 
 	public static void main(String[] args) throws Exception {
-	
+		
 	  InitHash.initDeviceTempID();
 	  InitHash.initTempBac();
 	  InitHash.initDeviceBacnetBroadcastMap();
+	  
+	  InitBacnetServerConfig.initBacnetVariables();
+	  
+	  ApiTokenOperations.initToken();
 	   
 	  //BacnetBroadcastOperations.initBroadcastList();
-		
-	  BacnetServerObject server = BacnetServerObject.getInstance();
-	  server.eventListener();
-	  server.start();
-	  BroadcastBacnetMap bbm = BroadcastBacnetMap.getInstance();
+	   BacnetServerObject  server = BacnetServerObject.getInstance();
+	   server.eventListener();
+	   server.start();
+	   BroadcastBacnetMap bbm = BroadcastBacnetMap.getInstance();
+	
 	  
 	 // RestServer bbm = new RestServer();
 	  
@@ -125,6 +136,10 @@ public class RestServer {
       });
 	  
 	  app.start(7007);
+	  
+	  
+	 
+	  
 
 	  
       // Define a route with a filter
@@ -167,7 +182,7 @@ public class RestServer {
 	   });
       
       app.get("/listAllTemplateDevices", ctx->{
-;
+
     	  //InitHash.initDeviceBacnetBroadcastMap();
     	  
           ApiController apiController = new ApiController();
@@ -185,6 +200,25 @@ public class RestServer {
    	  });
       
       
+      app.get("/listAllDevices", ctx->{
+
+    	  //InitHash.initDeviceBacnetBroadcastMap();
+    	  
+          ApiController apiController = new ApiController();
+          ctx.result(apiController.deviceList());
+      });
+      
+      app.post("/deleteDevices", ctx->{
+    	  String jsonPayload = ctx.body();
+          System.out.println(jsonPayload);
+          ApiController apiController = new ApiController();
+          apiController.deleteDevices(jsonPayload);
+          InitHash.initTempBac();
+          InitHash.initDeviceTempID();
+    	  InitHash.initDeviceBacnetBroadcastMap();
+    	
+      });
+      
 
       
       app.post("/device/{deviceName}", ctx->{
@@ -194,43 +228,74 @@ public class RestServer {
     	  //BacnetBroadcastOperations.initBroadcastList();
     	  
     	  
+    	  String token = ctx.queryParam("token");
     	  
-    	  String deviceName=ctx.pathParam("deviceName");
-    	  String jsonPayload = ctx.body();
-    	  System.out.println(jsonPayload);
+    	  if(ApiTokenOperations.isTokenValid(token)) {
     	  
-    	  System.out.println(Cache.deviceTemplateIDMap.keySet());
-    	  System.out.println( "Contains key "+Cache.deviceTemplateIDMap.containsKey(deviceName));
-    	  
-    	  
-    	  System.out.println(deviceName+" "+bbm.isDeviceLoaded(deviceName));
-    	  
-    	  if(bbm.isDeviceLoaded(deviceName)) {
-    		 bbm.updateBacnetObject(jsonPayload, deviceName);
-    		 System.out.println("Update");
-    	  }
-    	  else {
-    		  if(BacnetBroadcastMapOperations.containsDevice(deviceName)) {
-    			 System.out.println("Load Device "); 
-    			 bbm.loadBacnetObject(jsonPayload,deviceName);  
-    		  }else {
-    		     bbm.addBacnetObject(jsonPayload, deviceName);
-    			 System.out.println("Add Device "); 
-
-    		  }
-    	  }
+	    	  String deviceName=ctx.pathParam("deviceName");
+	    	  
+	    	  String jsonPayload = ctx.body();
+	    	  //System.out.println(jsonPayload);
+	    	  
+	    	  //System.out.println(Cache.deviceTemplateIDMap.keySet());
+	    	  //System.out.println( "Contains key "+Cache.deviceTemplateIDMap.containsKey(deviceName));
+	    	  
+	    	  
+	    	  //System.out.println(deviceName+" "+bbm.isDeviceLoaded(deviceName));
+	    	  
+	    	  if(bbm.isDeviceLoaded(deviceName)) {
+	    		 bbm.updateBacnetObject(jsonPayload, deviceName);
+	    		 System.out.println("Update");
+	    	  }
+	    	  else {
+	    		  if(BacnetBroadcastMapOperations.containsDevice(deviceName)) {
+	    			 System.out.println("Load Device "); 
+	    			 bbm.loadBacnetObject(jsonPayload,deviceName);  
+	    		  }else {
+	    		     bbm.addBacnetObject(jsonPayload, deviceName);
+	    			 System.out.println("Add Device "); 
+	
+	    		  }
+	    	  }
+	    	  
+	          Cache.activeApisMap.put(deviceName, DateTimeAPI.getCurrentTimeStamp());
+    	 }
+    	 else 
+    	 {
+            ctx.result("Invalid Token");
+    	 }
+          
       });
       
       
       app.get("/device/{deviceName}", ctx->{
     	  String deviceName=ctx.pathParam("deviceName");
-    	  if( Cache.deviceJsonPayloadMap.containsKey(deviceName)) 
-              ctx.result(Cache.deviceJsonPayloadMap.get(deviceName));
-    	  else
-              ctx.result("Device Doesn't Exist");
-
+          String token = ctx.queryParam("token");
+    	  
+    	 if(ApiTokenOperations.isTokenValid(token)) {
+    	    
+	    	  if( Cache.deviceJsonPayloadMap.containsKey(deviceName)) {
+	             ctx.result(Cache.deviceJsonPayloadMap.get(deviceName));
+	             Cache.activeApisMap.put(deviceName, DateTimeAPI.getCurrentTimeStamp());
+	    	  }    
+	    	  else 
+	    	  {
+	             ctx.result("Device Doesn't Exist");
+	    	  }
+    	 }
+    	 else {
+    		 ctx.result("Invalid Token!");
+    	 } 	  
     	  
       });
+      
+      
+      
+      app.get("/listAllActiveApis" , ctx ->{
+          ApiController apiController = new ApiController();
+          ctx.result(apiController.listAllActiveApis());  
+      });
+      
       
       
      app.post("/findBacnetObjects" , ctx ->{
@@ -276,20 +341,93 @@ public class RestServer {
       */
       
       
+     app.get("/getbacnetConfig", ctx -> {
+         ApiController apiController = new ApiController();
+         ctx.result( apiController.getBacnetConfig());
+     });
+     
+     app.post("/updateBacnetConfig", ctx -> {
+         String jsonPayload = ctx.body();
+         System.out.println(jsonPayload);
+   	     ApiController apiController = new ApiController();
+   	     apiController.updateBacnetConfig(jsonPayload);
+        // ctx.result( apiController.getBacnetConfig());
+     });
+     
+     
       
       app.get("/api", ctx -> {
+    	  //ctx.result(LoggerFactory.getILoggerFactory().getClass().toGenericString());
            ctx.result("JSON Payload Received Successfully");
       });
+      
+      app.get("/bacnetbroadcastlist", ctx -> {
+          ApiController apiController = new ApiController();
+          ctx.result(apiController.bacnetBroadcastList());
+
+      });
+      
+      app.get("/cacheInstanceBacnetObjectList", ctx->{
+          ApiController apiController = new ApiController();
+          ctx.result(apiController.cacheInstanceBacnetObjectList()); 
+      });
+      
+      
+ 
+      
+      
+      app.post("/clearBacnetBroadcastCache", ctx -> {
+    	  ApiController apiController = new ApiController();
+    	  apiController.deletingAllBacnetBroadcastObjects();
+          //bbm.clearBacnetBroadcast();
+         
+      });
+      
+      app.get("/Diagonistic",ctx->{  
+    	 ctx.result( Diagonstics.jsonDiagnosticsStats());   
+      });
+      
+      
+      app.get("/getApiToken",ctx->{  
+     	 ctx.result(ApiTokenOperations.ApiToken);   
+      });
+      
+      app.post("/generateNewTApiToken",ctx->{  
+    	  ApiTokenOperations.generateNewToken();
+      });
+      
+      app.post("/userUpdateOrCreate",ctx->{
+    	  ApiController apiController = new ApiController();
+          String jsonPayload = ctx.body();
+          System.out.println(jsonPayload);
+          apiController.userUpdateOrCreate(jsonPayload);
+	  });
+      
+      app.post("/authenticate",ctx->{
+    	  String jsonPayload = ctx.body();
+    	  ApiController apiController = new ApiController();
+          if(apiController.isAuthValid(jsonPayload)!=null) {
+        	  ctx.result(apiController.isAuthValid(jsonPayload)); 
+          }
+          else 
+          {
+              ctx.status(404).result("Not Valid");  
+          }
+    		  
+  	  });
+      
+      
       
       
       
       
       
 		
+
+	
 	}
 	
 	
-	 
 	 
 	   
 	   

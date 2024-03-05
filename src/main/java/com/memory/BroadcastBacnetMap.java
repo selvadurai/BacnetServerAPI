@@ -1,7 +1,9 @@
 package com.memory;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -415,6 +417,34 @@ public class BroadcastBacnetMap {
    
    public void removeBacnetObject(String deviceName) {
 	   deviceLoadList.remove(deviceName);
+   }
+   
+   public ConcurrentHashMap<String,Integer> broadcastMapList(){
+	   
+	   ConcurrentHashMap<String,Integer>  mapList =new ConcurrentHashMap<>();
+	   
+	   Iterator<Entry<String, BACnetObject>> iterator =broadcastMap.entrySet().iterator();
+	   
+       while (iterator.hasNext()) {
+           Entry<String, BACnetObject> entry = iterator.next();
+           
+           BACnetObject bacObj=entry.getValue();
+           
+           mapList.put(entry.getKey(),bacObj.getInstanceId());
+
+           
+    	   //iterator.next();
+    	  // d=iterator.next();
+    	   
+       }
+
+
+	   return mapList;
+   } 
+   
+   public void clearBacnetBroadcast() {
+	   broadcastMap.clear();
+	   deviceLoadList.clear();
    }
    
    

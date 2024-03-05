@@ -18,7 +18,11 @@ public interface Cache {
    //map<DeviceName,Payload> 
    public ConcurrentHashMap<String,String> deviceJsonPayloadMap = new ConcurrentHashMap<>();
 
+  
+   //Active API
+   public ConcurrentHashMap<String, String> activeApisMap = new ConcurrentHashMap<>();
 
+   
 
 
 }

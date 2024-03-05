@@ -21,12 +21,22 @@ public class BacnetServer {
 
     public BacnetServer() throws Exception {
     	
-        IpNetwork network = BacnetUtils.getIpNetwork("192.168.0.68", "255.255.255.0", 24, 47808);
-        int localDeviceID = 11111;
+    
+    	String ipaddress=InitBacnetServerConfig.ipaddress;
+    	String subMask=InitBacnetServerConfig.subnetMask;
+    	int networkPrefix=InitBacnetServerConfig.networkPrefix;
+    	int portNumber=InitBacnetServerConfig.bacnetPort;
+    	int instanceNum=InitBacnetServerConfig.instance;
+    	String deviceName=InitBacnetServerConfig.deviceName;
+
+
+    	
+        IpNetwork network = BacnetUtils.getIpNetwork(ipaddress, subMask, networkPrefix, portNumber);
+        int localDeviceID = instanceNum;
         DefaultTransport transport = new DefaultTransport(network);
         LocalDevice localDevice = new LocalDevice(localDeviceID, transport);
         System.out.println("Local device is running with device id " + localDeviceID);
-        localDevice.writePropertyInternal(PropertyIdentifier.objectName, new CharacterString("Bacnet4j Slave Device01"));
+        localDevice.writePropertyInternal(PropertyIdentifier.objectName, new CharacterString(deviceName));
         
         localDevice.getEventHandler().addListener(new DeviceEventListener() {
 

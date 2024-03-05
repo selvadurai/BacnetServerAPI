@@ -3,43 +3,37 @@ package com.dao;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.authentication.UserOperations;
+import com.pojo.BacnetSettings;
 import com.pojo.Device;
 import com.pojo.DeviceTemplate;
+import com.pojo.User;
 
 public class Test {
 
 	public static void main(String[] args) {
-		//DeviceTempDAO device = new DeviceTempDAO();
-		/*
-		DeviceTempDAO deviceTempDAO = new DeviceTempDAO();
 		
-		deviceTempDAO.addDeviceTemplate("Honey Sensor Template", "{hello world}");
+		//BacnetSettingsDAO bacnetSettingDAO = new BacnetSettingsDAO();
+		//String ipAddress, String submask, int networkPrefix, int instanceId, int bacnetPort, String bacnetServerName
+		//BacnetSettings bacnetSettings = new BacnetSettings("192.168.0.11","255.255.255.255",24,1111,47808,"BacnetAPI Server");
+		//bacnetSettingDAO.addOrUpdateBacnetSettings(bacnetSettings);
 		
-		
-		List<DeviceTemplate> deviceTempList=deviceTempDAO.getAllDeviceTemplates();
-		
-		System.out.println( deviceTempList.size());
-		
-		for(int i=0; i<deviceTempList.size();i++) {
-			System.out.println(deviceTempList.get(i).getName());
-		}*/
+		//ApiTokenDAO apiTokenDAO = new ApiTokenDAO();
+		//apiTokenDAO.updateOrCreateToken("Haryana");
+		//System.out.println(apiTokenDAO.getToken());
+		//User user = new User("su", "su");
+		//User user1 = new User("admin", "admin");
 
-		//BacnetObjectDAO bacObjDAO = new BacnetObjectDAO();
-		//bacObjDAO.addBacnetObject(6,"AnalogInput", 0, 0, "Number", "C02");
-		
-		 //Device d = new Device();
-		// d.setDevTempId(6);
-		// d.setName("HoneyWellSensor");
-		 
 		
 		
-	///	 DeviceDAO regent = new DeviceDAO();
-		/// regent.addDevice(d);
-				
-		//Cache.initDeviceTempID
 		
-		//String objectName="DeviceTemp";
-		//System.out.println(objectName.);
+		//UserDAO userDAO = new UserDAO();
+		//userDAO.insertOrUpdateUser(user);
+		//userDAO.insertOrUpdateUser(user1);
+		
+		//UserOperations.updateOrCreateUser("java","java");
+		
+		System.out.println( UserOperations.isUserValid("admin", "admin"));
 		
 		
 	}
