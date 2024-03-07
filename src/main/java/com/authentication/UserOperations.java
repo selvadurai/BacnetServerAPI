@@ -30,6 +30,17 @@ public class UserOperations {
 		
 	}
 	
+	public static void factoryReset() {
+		UserDAO userDAO = new UserDAO();
+		
+		if( !userDAO.recordExists()) {
+			UserOperations.updateOrCreateUser("admin","admin");
+		}
+		
+		
+		
+	}
+	
 	
 	public static boolean isUserValid(String username,String password) {
 		

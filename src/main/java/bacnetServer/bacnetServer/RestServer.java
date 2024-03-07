@@ -15,6 +15,7 @@ import com.authentication.UserOperations;
 import com.controller.ApiController;
 import com.dao.DeviceDAO;
 import com.dao.DeviceTempDAO;
+import com.dao.SQLiteDB;
 import com.diagonistics.Diagonstics;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -42,14 +43,12 @@ import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.CharacterString;
 import com.serotonin.bacnet4j.type.primitive.Real;
 
-
 import io.javalin.Javalin;
 import server.BacnetServerObject;
 import server.InitBacnetServerConfig;
 
 
 public class RestServer {
-	
 	List<BACnetObject> bacNetList;
 	BacnetServerObject server=BacnetServerObject.getInstance();
 	   
@@ -63,12 +62,18 @@ public class RestServer {
 
 
 	public static void main(String[] args) throws Exception {
-		
+	  
+	  System.out.println(args[0]);
+	  SQLiteDB.url=args[0];
+
 	  InitHash.initDeviceTempID();
 	  InitHash.initTempBac();
 	  InitHash.initDeviceBacnetBroadcastMap();
 	  
 	  InitBacnetServerConfig.initBacnetVariables();
+	  
+	  
+	  UserOperations.factoryReset();
 	  
 	  ApiTokenOperations.initToken();
 	   
@@ -137,9 +142,7 @@ public class RestServer {
 	  
 	  app.start(7007);
 	  
-	  
 	 
-	  
 
 	  
       // Define a route with a filter
@@ -230,47 +233,56 @@ public class RestServer {
     	  
     	  String token = ctx.queryParam("token");
     	  
-    	  if(ApiTokenOperations.isTokenValid(token)) {
+    	if(ApiTokenOperations.isTokenValid(token)) {
     	  
-	    	  String deviceName=ctx.pathParam("deviceName");
+	    	  		String deviceName=ctx.pathParam("deviceName").trim();
 	    	  
-	    	  String jsonPayload = ctx.body();
-	    	  //System.out.println(jsonPayload);
-	    	  
-	    	  //System.out.println(Cache.deviceTemplateIDMap.keySet());
-	    	  //System.out.println( "Contains key "+Cache.deviceTemplateIDMap.containsKey(deviceName));
-	    	  
-	    	  
-	    	  //System.out.println(deviceName+" "+bbm.isDeviceLoaded(deviceName));
-	    	  
-	    	  if(bbm.isDeviceLoaded(deviceName)) {
-	    		 bbm.updateBacnetObject(jsonPayload, deviceName);
-	    		 System.out.println("Update");
-	    	  }
-	    	  else {
-	    		  if(BacnetBroadcastMapOperations.containsDevice(deviceName)) {
-	    			 System.out.println("Load Device "); 
-	    			 bbm.loadBacnetObject(jsonPayload,deviceName);  
-	    		  }else {
-	    		     bbm.addBacnetObject(jsonPayload, deviceName);
-	    			 System.out.println("Add Device "); 
-	
-	    		  }
-	    	  }
-	    	  
-	          Cache.activeApisMap.put(deviceName, DateTimeAPI.getCurrentTimeStamp());
-    	 }
-    	 else 
-    	 {
-            ctx.result("Invalid Token");
-    	 }
-          
+	    	  		String jsonPayload = ctx.body();
+			    	  //System.out.println(jsonPayload);
+			    	  
+			    	  //System.out.println(Cache.deviceTemplateIDMap.keySet());
+			    	  //System.out.println( "Contains key "+Cache.deviceTemplateIDMap.containsKey(deviceName));
+			    	  
+			    	  
+			    	  //System.out.println(deviceName+" "+bbm.isDeviceLoaded(deviceName));
+			    	  
+			      if(bbm.validateJson(jsonPayload, deviceName)) {  
+			    	  System.out.println("Valid payload");
+			    	  if(bbm.isDeviceLoaded(deviceName)) {
+			    		 bbm.updateBacnetObject(jsonPayload, deviceName);
+			    		 System.out.println("Update");
+			    	  }
+			    	  else {
+			    		  if(BacnetBroadcastMapOperations.containsDevice(deviceName)) {
+			    			 System.out.println("Load Device "); 
+			    			 bbm.loadBacnetObject(jsonPayload,deviceName);  
+			    		     }else {
+			    		       bbm.addBacnetObject(jsonPayload, deviceName);
+			    			   System.out.println("Add Device "); 
+			    		     }
+			    	  }
+			    	  
+			        Cache.activeApisMap.put(deviceName, DateTimeAPI.getCurrentTimeStamp());
+		    	  }else {
+		     		ctx.result("Invalid Payload");
+ 
+		    	   }
+    	
+    	}
+    	else {
+    		
+    		ctx.result("Invalid Token");
+    	}
+	      
+	      
+	      
+    	       
       });
       
       
       app.get("/device/{deviceName}", ctx->{
     	  String deviceName=ctx.pathParam("deviceName");
-          String token = ctx.queryParam("token");
+          String token = ctx.queryParam("token").trim();
     	  
     	 if(ApiTokenOperations.isTokenValid(token)) {
     	    
@@ -419,11 +431,9 @@ public class RestServer {
       
       
       
-      
-      
-      
-		
 
+      
+      
 	
 	}
 	

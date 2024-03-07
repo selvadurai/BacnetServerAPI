@@ -27,7 +27,7 @@ public class UserDAO {
     }
 
     // Check if a record already exists
-    private boolean recordExists() {
+    public boolean recordExists() {
         String sql = "SELECT COUNT(*) FROM User";
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(sql);

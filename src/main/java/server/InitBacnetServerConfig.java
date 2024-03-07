@@ -8,7 +8,7 @@ import com.pojo.BacnetSettings;
 public class InitBacnetServerConfig {
 	
 	//Default Values
-	public static String ipaddress="192.168.0.11";
+	public static String ipaddress="0.0.0.0";
 	public static String subnetMask="255.255.255.255";
 	public static int networkPrefix=24;
 	public static int instance=1111;

@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.dao.BroadcastBacnetDAO;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
@@ -105,6 +106,49 @@ public class BroadcastBacnetMap {
 	   
   
    
+  
+   
+   
+   public boolean validateJson(String jsonPayload,String deviceName) {
+	   try {
+		   
+	   
+			   int templateID=Cache.deviceTemplateIDMap.get(deviceName);
+			   TemplateBacnetListObject templateBacnetList=Cache.templateBacMap.get(templateID);
+			   JsonObject jsonObject= JsonParser.parseString(jsonPayload).getAsJsonObject();
+			   
+			   List<BacnetObject> baclist =templateBacnetList.getBacnetObjectList();
+			   
+			    for(int i=0;i<baclist.size();i++) {
+			    	String bacJsonKeyName=baclist.get(i).getName();;
+					String bacnetObjectName=deviceName+baclist.get(i).getName();
+					String bacnetObjType=baclist.get(i).getBacObjType();
+					
+					JsonElement  jsonElement=jsonObject.get(bacJsonKeyName);
+					
+					if(jsonElement.getAsJsonPrimitive().isBoolean() && bacnetObjType.startsWith("A")) {
+						return false;
+					}else if(jsonElement.getAsJsonPrimitive().isNumber() && bacnetObjType.startsWith("B")) {
+						
+						return false;
+					}
+					else if(jsonElement.getAsJsonPrimitive().isString()) {
+						return false;
+					}
+			    }
+			    
+			  }catch (Exception e) {
+		            // Handle other exceptions
+		            System.err.println("An unexpected error occurred: " + e.getMessage());
+		            return false;
+		      } 
+	          
+	   
+	   
+	   return true;
+   }
+   
+   
    
    
    
@@ -122,6 +166,9 @@ public class BroadcastBacnetMap {
 	   
 	  
 	   List<BacnetObject> baclist =templateBacnetList.getBacnetObjectList();
+	   
+	   
+	  
 	  
 	   try {	
 		  //Looping Bacnet List 

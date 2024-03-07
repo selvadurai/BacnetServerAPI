@@ -43,12 +43,12 @@ public class ApiController {
         JsonObject outerJsonObject = gson.fromJson(jsonObject, JsonObject.class);
 
         // Extracting the inner JSON string
-        String innerJsonString = outerJsonObject.get("data").getAsString();
+        String innerJsonString = outerJsonObject.get("data").getAsString().trim();
 
         // Parsing the inner JSON string
         JsonObject innerJsonObject = gson.fromJson(innerJsonString, JsonObject.class);
 
-        String templateName = innerJsonObject.get("templateName").getAsString();
+        String templateName = innerJsonObject.get("templateName").getAsString().trim();
         
         
         JsonArray bacnetNameList = innerJsonObject.getAsJsonArray("name").getAsJsonArray();
@@ -70,10 +70,10 @@ public class ApiController {
 		
 		for(int i=0;i<bacnetNameList.size();i++) {
 			System.out.println("Creating Bacnet Objects");
-			String bacnetObjType=bacnetObjectTypeList.get(i).getAsString();
+			String bacnetObjType=bacnetObjectTypeList.get(i).getAsString().trim();
 			//int instanceNum=instanceNumberList.get(i).getAsInt();
 			//int reqDefault=reqDefaultList.get(i).getAsInt();
-            String name = bacnetNameList.get(i).getAsString();
+            String name = bacnetNameList.get(i).getAsString().trim();
 			bacnetObjectDAO.addBacnetObject(templateID, bacnetObjType, name);
 		}
 		
@@ -213,7 +213,7 @@ public class ApiController {
 		              JsonObject markedDeviceObject = markedDeviceElement.getAsJsonObject();
                       JsonObject device = markedDeviceObject.getAsJsonObject();
                       if(device!=null) {
-                        String deviceName=device.get("deviceName").getAsString();
+                        String deviceName=device.get("deviceName").getAsString().trim();
                         int id=device.get("id").getAsInt();
 
                       	
