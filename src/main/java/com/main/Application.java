@@ -270,7 +270,8 @@ public class Application {
 			    			   System.out.println("Add Device "); 
 			    		     }
 			    	  }
-			    	  
+			    	
+			    	//Cache device active 
 			        Cache.activeApisMap.put(deviceName, DateTimeAPI.getCurrentTimeStamp());
 		    	  }else {
 		     		ctx.result("Invalid Payload");

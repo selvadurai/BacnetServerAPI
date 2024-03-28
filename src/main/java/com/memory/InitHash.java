@@ -1,9 +1,28 @@
 package com.memory;
 
+/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Author: Jonathan Kevin Selvadurai
+ * Date: March 25 2024
+ */
+
+
+
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import com.dao.BacnetObjectDAO;
 import com.dao.BroadcastBacnetDAO;
 import com.dao.DeviceDAO;
@@ -13,6 +32,9 @@ import com.pojo.BroadcastBacnet;
 import com.pojo.Device;
 import com.pojo.DeviceTemplate;
 import com.pojo.TemplateBacnetListObject;
+
+
+
 
 public class InitHash {
 	
@@ -83,8 +105,10 @@ public class InitHash {
 	
 	
 	
-	
-
+	/* 
+	 * Loads  ["JCI1",1] from  database.
+	 * loads deviceName and template id into deviceTemplateIDMap
+	 * */
 	public static  void initDeviceTempID () {
 		 Cache.deviceTemplateIDMap.clear();
 		
@@ -99,7 +123,12 @@ public class InitHash {
 				
    }
 	
-	public static  void initTempBac () {
+	
+    /*  
+	* Loads  Template ID and TemplateBacnetListObject into templateBacMap
+    * 
+    * */
+   public static  void initTempBac () {
 		
 		  Cache.templateBacMap.clear();
 		
@@ -139,7 +168,7 @@ public class InitHash {
 				
     }
 	
-	
+	//loads [instanceNumber,BroadcastBacnet Object] into deviceBacnetBroadcastMap
 	public static void initDeviceBacnetBroadcastMap() {
 		Cache.deviceBacnetBroadcastMap.clear();
 		

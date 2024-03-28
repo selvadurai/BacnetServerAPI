@@ -1,5 +1,27 @@
 package com.memory;
 
+
+/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Author: Jonathan Kevin Selvadurai
+ * Date: March 26 2024
+ */
+
+
+
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -54,20 +76,22 @@ public class BroadcastBacnetMap {
 
    }
    
+   //Only function that can instaniate the class
+   //Uses Singleton Pattern
    public static BroadcastBacnetMap getInstance() {
        return INSTANCE;
    }
    
    
    
-   
+   //Checks if device is in deviceLoadList 
    public boolean isDeviceLoaded(String deviceName) {
 	   return deviceLoadList.contains(deviceName);
 	}
    
    
    
-   
+   //Update Bacnet Object 
    public void updateBacnetObject(String jsonPayload,String deviceName) {
 	   Cache.deviceJsonPayloadMap.put(deviceName, jsonPayload);
 	   int templateID=Cache.deviceTemplateIDMap.get(deviceName);
@@ -76,7 +100,7 @@ public class BroadcastBacnetMap {
 	   
 	   
 	   
-	   
+	   //Loads a list of bacnetObjects
 	   List<BacnetObject> baclist =templateBacnetList.getBacnetObjectList();
 	   JsonObject jsonObject= JsonParser.parseString(jsonPayload).getAsJsonObject();
 
@@ -87,6 +111,10 @@ public class BroadcastBacnetMap {
 		   String bacnetObjectName=deviceName+baclist.get(i).getName();
 		 
 		   
+		   /*
+		    * A-BacnetObject is a float 
+		    * B-BacnetObject is a boolean
+		    */
 		   switch(objectType.charAt(0)) {
 		     
 		     case 'A':
@@ -108,7 +136,7 @@ public class BroadcastBacnetMap {
    
   
    
-   
+   //Checks if the payload is valid 
    public boolean validateJson(String jsonPayload,String deviceName) {
 	   try {
 		   
@@ -126,6 +154,13 @@ public class BroadcastBacnetMap {
 					
 					JsonElement  jsonElement=jsonObject.get(bacJsonKeyName);
 					
+					/* Checks if the JSON type matches the bacnet object type
+					 * 
+					 * For example
+					 * Hum:43 BinaryObject returns false
+					 * Hum:43 AnalogObject returns true
+					 * 
+					 */
 					if(jsonElement.getAsJsonPrimitive().isBoolean() && bacnetObjType.startsWith("A")) {
 						return false;
 					}else if(jsonElement.getAsJsonPrimitive().isNumber() && bacnetObjType.startsWith("B")) {
@@ -152,7 +187,7 @@ public class BroadcastBacnetMap {
    
    
    
-   
+   //Adds bacnet Object broadcastMap
    public void addBacnetObject(String jsonPayload,String deviceName) {
 	   Cache.deviceJsonPayloadMap.put(deviceName, jsonPayload);
 	   
@@ -180,7 +215,8 @@ public class BroadcastBacnetMap {
 			  
 			   
 			   int instanceNum =BacnetBroadcastMapOperations.generateBacnetInstanceNum();
-
+			   
+			   //Loading Bacnet Object to the matching put statement
 			   
 			   if(bacnetObjType.equals("AnalogInput")) {
 				   float  value=jsonObject.get(name).getAsFloat();
@@ -299,7 +335,6 @@ public class BroadcastBacnetMap {
 	     
 	      
 	        
-	      
 	        deviceLoadList.add(deviceName);
 	      
 	      
@@ -320,6 +355,8 @@ public class BroadcastBacnetMap {
    }
    
    
+   
+   //Loads BacnetObject that has been save to database and that is cached
    public void loadBacnetObject(String jsonPayload,String deviceName) {
 	   //int templateID=Cache.deviceTemplateIDMap.get(deviceName);
 	   
@@ -329,8 +366,7 @@ public class BroadcastBacnetMap {
 	   
 	   
 	   
-	  // BroadcastBacnetDAO  dao = new BroadcastBacnetDAO();
-	   //List<BroadcastBacnet> baclist =dao.getAllBroadcastBacnets();
+	   //Gets all the devices that are broadcasted 
 	   List<BroadcastBacnet> baclist =  BacnetBroadcastMapOperations.getAllDeviceBroadcastList(deviceName);
 	   
 	   try {	
@@ -451,6 +487,9 @@ public class BroadcastBacnetMap {
 		   	   
    }
    
+   //Enum function to determine the BinaryPV enum
+   //Enum is used to determine if boolean bacnetObject
+   //is true or false
    public BinaryPV getBinaryPvValue(boolean value) { 
    
 	 if(value==true)   
@@ -461,11 +500,12 @@ public class BroadcastBacnetMap {
    
    }
    
-   
+   //Removes bacnetObject
    public void removeBacnetObject(String deviceName) {
 	   deviceLoadList.remove(deviceName);
    }
    
+   //Returns the deviceName and instanceID in map
    public ConcurrentHashMap<String,Integer> broadcastMapList(){
 	   
 	   ConcurrentHashMap<String,Integer>  mapList =new ConcurrentHashMap<>();
@@ -489,6 +529,7 @@ public class BroadcastBacnetMap {
 	   return mapList;
    } 
    
+   //Clears all bacnetObjects that are cached and stored in the database
    public void clearBacnetBroadcast() {
 	   broadcastMap.clear();
 	   deviceLoadList.clear();
@@ -496,30 +537,5 @@ public class BroadcastBacnetMap {
    
    
    
-   
-  
-    /*
-   public static void main(String [] args) {
-	   String jsonPayload = "{"
-               + "\"Temp\": 28.323,"
-               + "\"Humidity\": 88.545453"
-               + "}";
-	   		
-	   String jsonPayload11 = "{"
-               + "\"Temp\": 11,"
-               + "\"Humidity\":989"
-               + "}";
-	   			   
-			   
-			  
-	   BroadcastBacnetMap broadcast = new BroadcastBacnetMap();
-	   broadcast.addBacnetObject(jsonPayload, "JCISensor");
-	   broadcast.updateBacnetObject(jsonPayload11, "JCISensor");
-	   
-	   
-	   
-	   //System.out.println(broadcast.isDeviceLoaded("JCISensor"));
-   }
-	*/
 
 }
