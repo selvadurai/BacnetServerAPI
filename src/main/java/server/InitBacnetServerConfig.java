@@ -1,5 +1,26 @@
 package server;
 
+/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Author: Jonathan Kevin Selvadurai
+ * Date: May 7 2024
+ */
+
+
+
+
 import java.util.List;
 
 import com.dao.BacnetSettingsDAO;
@@ -15,6 +36,7 @@ public class InitBacnetServerConfig {
 	public static int bacnetPort=47808;
 	public static String deviceName="BacnetAPI Server";
 	
+    //Sets default bacnet variables 	
 	public static void setDefaultBacnetVariables() {
 		BacnetSettingsDAO bacnetSettingDAO = new BacnetSettingsDAO();
 
@@ -32,7 +54,7 @@ public class InitBacnetServerConfig {
 		}
 	}
 	
-	
+	//Initializes Bacnet Variables 
 	public static void initBacnetVariables() {
 		BacnetSettingsDAO bacnetSettingDAO = new BacnetSettingsDAO();
 
